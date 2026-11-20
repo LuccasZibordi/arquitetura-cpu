@@ -131,6 +131,84 @@ registradores nem como o endereco J gera o proximo PC.
 GHDL=/home/luccas/.local/opt/ghdl-6.0.0/ghdl-mcode-6.0.0-ubuntu24.04-x86_64/bin/ghdl bash tests/run_all.sh
 ```
 
-Com GHDL no PATH, basta `bash tests/run_all.sh`. Sao cinco suites: banco,
-registrador de instrucao, PC, extensor e formatos. A ULA incompleta nao faz
-parte destas suites.
+Com GHDL no PATH, basta `bash tests/run_all.sh`. Sao sete suites: banco, registrador de instrucao, PC, extensor, formatos,
+ULA e registradores da ULA.
+
+
+## ULA (alu.vhd)
+
+`alu.vhd` substitui o antigo `ula.vhd` incompleto; a entidade agora e `alu`.
+Interface: entradas `A`, `B` (16 bits), `Op` (3 bits); saidas `S` (16 bits),
+`Zero` e `Overflow` (1 bit cada). Circuito combinacional, sem clock/reset.
+
+| Op | Operacao | Resultado |
+| --- | --- | --- |
+| 000 | ADD | A + B, 16 bits inferiores |
+| 001 | SUB | A - B, 16 bits inferiores |
+| 010 | AND | A and B |
+| 011 | OR | A or B |
+| 100 | SLT | 0001 se signed(A) < signed(B), senao 0000 |
+| 101/110/111 | Nao utilizado | 0000 |
+
+Esses seletores sao controles internos, nao opcodes da ISA. ADDI e calculos
+aritmeticos de enderecos podem usar ADD, com operandos selecionados externamente.
+A ULA nao acessa memoria nem decodifica instrucoes.
+
+`Zero=1` se e somente se S=0000, inclusive SLT falso e seletores nao usados.
+`Overflow` sinaliza estouro **com sinal** em ADD/SUB; nas demais operacoes e 0.
+O resultado nao satura: 7FFF+0001=8000 com Overflow=1; FFFF+0001=0000 com
+Overflow=0 (carry nao e overflow signed). 8000+8000=0000 ativa ambas as flags.
+SLT compara diretamente os operandos com sinal, sem depender do sinal da subtracao.
+Entradas devem ter bits binarios validos; X/U/Z nao representam operandos suportados.
+
+```bash
+bash tests/run_alu.sh
+```
+
+`tb_alu.vhd` verifica 266 vetores: casos explicitos das cinco operacoes,
+mascaras, Zero, overflow positivo/negativo, carry sem overflow e seletores
+nao usados. Um oraculo inteiro independente verifica ADD/SUB/SLT para 81
+pares de valores, incluindo os extremos -32768/32767, negativos e igualdade.
+Tambem verifica limpeza de Overflow apos mudanca de operacao.
+
+## Registradores de operandos e resultado
+
+`reg_a`, `reg_b` e `alu_out` oferecem a mesma interface:
+
+- `clk`, `reset`, `write_enable`: entradas de 1 bit.
+- `data_in`, `data_out`: entrada/saida de 16 bits.
+- Reset assincrono ativo alto, prioritario, zerando a saida.
+- Captura na subida com write_enable=1; retencao caso contrario.
+- Aplicar reset antes do uso; nao ha inicializacao implicita.
+
+Cada instancia tem sua propria habilitacao. Conectar reg_a/reg_b a A/B da ULA
+e S a data_in de alu_out. Zero/Overflow sao combinacionais e **nao** ficam
+armazenados em alu_out: se forem necessarios depois, o controle deve prever
+sua captura separadamente.
+
+Se os tres registradores forem habilitados na mesma borda, alu_out captura o
+resultado dos operandos anteriores. Para obter o resultado dos novos operandos,
+capturar A/B em uma borda e o resultado em uma borda posterior. Operacao e
+operandos precisam estar estaveis antes da captura do resultado.
+
+```bash
+bash tests/run_alu_registers.sh
+```
+
+`tb_alu_registers.vhd` conecta os quatro modulos reais e cobre habilitacoes
+independentes, retencao, preservacao de bits, subida/descida, habilitacao com
+clock alto, reset sem escrita/clock, prioridade/recuperacao de reset e ciclos
+de captura do resultado. Esses testes nao constituem execucao de CPU completa.
+
+## Sintese dos novos componentes
+
+Com o mesmo GHDL usado nos testes, para cada entidade:
+
+```bash
+ghdl --synth --std=08 alu.vhd -e alu
+ghdl --synth --std=08 reg_a.vhd -e reg_a
+ghdl --synth --std=08 reg_b.vhd -e reg_b
+ghdl --synth --std=08 alu_out.vhd -e alu_out
+```
+
+A sintese GHDL nao substitui place-and-route, analise de temporizacao ou teste em FPGA.
