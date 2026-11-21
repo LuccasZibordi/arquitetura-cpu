@@ -131,8 +131,8 @@ registradores nem como o endereco J gera o proximo PC.
 GHDL=/home/luccas/.local/opt/ghdl-6.0.0/ghdl-mcode-6.0.0-ubuntu24.04-x86_64/bin/ghdl bash tests/run_all.sh
 ```
 
-Com GHDL no PATH, basta `bash tests/run_all.sh`. Sao sete suites: banco, registrador de instrucao, PC, extensor, formatos,
-ULA e registradores da ULA.
+Com GHDL no PATH, basta `bash tests/run_all.sh`. São oito suítes, incluindo banco, registrador de instrução, PC, extensor,
+formatos, ULA, registradores da ULA e memória.
 
 
 ## ULA (alu.vhd)
@@ -212,3 +212,38 @@ ghdl --synth --std=08 alu_out.vhd -e alu_out
 ```
 
 A sintese GHDL nao substitui place-and-route, analise de temporizacao ou teste em FPGA.
+
+## RAM, REM e RDM
+
+```bash
+bash tests/run_memory.sh
+```
+
+A RAM tem uma porta compartilhada para instruções e dados, com 1024 palavras
+de 16 bits. Cada endereço de 10 bits seleciona uma palavra entre 0 e 1023.
+A seleção do endereço de 10 bits a partir do PC ou da ULA de 16 bits será
+definida na integração do datapath.
+
+| Sinais na subida de `clk` | Operação |
+| --- | --- |
+| `write_enable = 1` | Grava `data_in` em `address` e mantém `data_out`, inclusive se `read_enable = 1` |
+| `write_enable = 0`, `read_enable = 1` | Atualiza `data_out` com a palavra em `address` após a borda |
+| Ambas desabilitadas | Preserva as palavras e a última saída |
+
+O REM pode ser usado para manter o endereço estável entre etapas. Com ele,
+uma leitura pode carregar o REM na primeira borda, ler a RAM na segunda e
+capturar `data_out` no RDM na terceira. A saída da RAM só é válida após a
+primeira leitura. REM e RDM têm reset assíncrono ativo alto e habilitação
+de escrita independente. O reset dos registradores preserva a RAM.
+
+O arquivo `memory_test.mif` contém palavras de teste para a RAM. O genérico
+`init_file` seleciona o MIF. No Quartus, o atributo `ram_init_file` vincula
+a imagem à RAM inferida. O teste GHDL lê a mesma imagem; para usar outro MIF
+na simulação, mantenha o cabeçalho e a formatação do exemplo, com endereços
+HEX de três dígitos, dados HEX de quatro dígitos e uma atribuição por linha.
+O carregador de simulação aceita linhas vazias, endereços individuais e
+faixas inclusivas, seguindo o formato do arquivo de exemplo.
+
+O testbench verifica a inicialização nos limites e na faixa zerada, a
+escrita, a prioridade da escrita sobre uma leitura simultânea, a retenção,
+a latência entre REM, RAM e RDM e a preservação da RAM após reset.

@@ -11,6 +11,9 @@ Componentes de uma CPU de 16 bits em VHDL-2008.
 | alu.vhd | ADD, SUB, AND, OR, SLT signed, Zero e Overflow |
 | reg_a.vhd / reg_b.vhd | Captura independente dos operandos |
 | alu_out.vhd | Captura do resultado da ULA |
+| memory.vhd | RAM síncrona de 1024 palavras de 16 bits, inicializada por MIF |
+| memory_address_register.vhd | Registrador de endereço da memória (REM), 10 bits |
+| memory_data_register.vhd | Registrador de dados da memória (RDM), 16 bits |
 
 Todos os registradores usam subida do clock e reset assincrono ativo alto.
 O arquivo ula.vhd incompleto foi substituido por alu.vhd (entidade alu).
@@ -32,5 +35,5 @@ Nesta maquina:
 GHDL=/home/luccas/.local/opt/ghdl-6.0.0/ghdl-mcode-6.0.0-ubuntu24.04-x86_64/bin/ghdl bash tests/run_all.sh
 ```
 
-As sete suites usam diretorios temporarios e falham ao detectar uma assertion.
+As oito suites usam diretorios temporarios e falham ao detectar uma assertion.
 Veja [interfaces, operacoes, flags e cobertura](tests/README.md).
