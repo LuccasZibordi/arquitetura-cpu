@@ -17,9 +17,9 @@ Componentes de uma CPU de 16 bits em VHDL-2008.
 
 Todos os registradores usam subida do clock e reset assincrono ativo alto.
 O arquivo ula.vhd incompleto foi substituido por alu.vhd (entidade alu).
-Ainda nao ha CPU completa: faltam integracao, controle e definicoes completas
-da ISA. A validacao atual e por simulacao de componentes e do caminho
-reg_a/reg_b -> ULA -> alu_out, sem validacao FPGA.
+Ainda nao ha CPU completa: faltam integracao e controle. A ISA esta
+especificada em [docs/isa.md](docs/isa.md). A validacao atual e por simulacao
+de componentes e do caminho reg_a/reg_b -> ULA -> alu_out, sem validacao FPGA.
 
 ## Testes
 
