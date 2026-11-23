@@ -23,9 +23,10 @@ Todos os registradores usam subida do clock e reset assincrono ativo alto.
 O arquivo ula.vhd incompleto foi substituido por alu.vhd (entidade alu).
 A CPU completa esta integrada em `cpu.vhd` e documentada em
 [docs/cpu.md](docs/cpu.md). A ISA esta em [docs/isa.md](docs/isa.md), o caminho
-de dados em [docs/datapath.md](docs/datapath.md) e o controle em
-[docs/control_unit.md](docs/control_unit.md). A validacao e por simulacao,
-sem validacao FPGA.
+de dados em [docs/datapath.md](docs/datapath.md), o controle em
+[docs/control_unit.md](docs/control_unit.md) e os programas de teste em
+[docs/programs.md](docs/programs.md). A validacao e por simulacao, sem
+validacao FPGA.
 
 ## Testes
 
@@ -41,5 +42,5 @@ Nesta maquina:
 GHDL=/home/luccas/.local/opt/ghdl-6.0.0/ghdl-mcode-6.0.0-ubuntu24.04-x86_64/bin/ghdl bash tests/run_all.sh
 ```
 
-As onze suites usam diretorios temporarios e falham ao detectar uma assertion.
+As doze suítes usam diretorios temporarios e falham ao detectar uma assertion.
 Veja [interfaces, operacoes, flags e cobertura](tests/README.md).

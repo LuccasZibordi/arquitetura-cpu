@@ -168,13 +168,26 @@ estado final: PC = 0008, R3 = 0003, Mem[0] = 0003 e o JMP final no IR. A
 interface completa e a lista de arquivos estao em
 [docs/cpu.md](../docs/cpu.md).
 
+## Programas completos
+
+```bash
+GHDL=/caminho/para/ghdl bash tests/run_programs.sh
+```
+
+Quatro imagens MIF (`p1_arith.mif`, `p2_limit.mif`, `p3_mem.mif`,
+`p4_r0_jump.mif`) exercitam todas as instrucoes da ISA com opcodes reais,
+valores negativos, limites aritmeticos, leitura/escrita de memoria, protecao
+de R0 e saltos. `tb_program.vhd` e parametrizado por `program` e compara o
+estado final com a tabela em [docs/programs.md](../docs/programs.md), com
+limite de 500 ciclos por programa.
+
 ## Executar todas as suites
 
 ```bash
 GHDL=/home/luccas/.local/opt/ghdl-6.0.0/ghdl-mcode-6.0.0-ubuntu24.04-x86_64/bin/ghdl bash tests/run_all.sh
 ```
 
-Com GHDL no PATH, basta `bash tests/run_all.sh`. São onze suítes, incluindo banco, registrador de instrução, PC, extensor,
+Com GHDL no PATH, basta `bash tests/run_all.sh`. São doze suítes, incluindo banco, registrador de instrução, PC, extensor,
 formatos, ULA, registradores da ULA e memória.
 
 
