@@ -45,7 +45,9 @@ begin
             opcode => opcode, zero => zero, overflow => overflow,
             pc_out => pc_out, instruction => instruction,
             a_out => a_out, b_out => b_out, alu_result => alu_result,
-            rdm_out => rdm_out, fetched_word => fetched_word
+            rdm_out => rdm_out, fetched_word => fetched_word,
+            reg_write_addr => open, reg_write_data => open,
+            mem_addr => open, mem_write_data => open
         );
 
     stimulus : process

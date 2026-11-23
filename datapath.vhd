@@ -28,7 +28,11 @@ entity datapath is
         opcode : out std_logic_vector(3 downto 0);
         zero, overflow : out std_logic;
         pc_out, instruction, a_out, b_out, alu_result : out std_logic_vector(15 downto 0);
-        rdm_out, fetched_word : out std_logic_vector(15 downto 0)
+        rdm_out, fetched_word : out std_logic_vector(15 downto 0);
+        reg_write_addr : out std_logic_vector(2 downto 0);
+        reg_write_data : out std_logic_vector(15 downto 0);
+        mem_addr : out std_logic_vector(9 downto 0);
+        mem_write_data : out std_logic_vector(15 downto 0)
     );
 end entity datapath;
 
@@ -113,4 +117,8 @@ begin
     alu_result <= out_value;
     rdm_out <= rdm_value;
     fetched_word <= mem_data;
+    reg_write_addr <= ri;
+    reg_write_data <= wb_value;
+    mem_addr <= mem_address;
+    mem_write_data <= store_data;
 end architecture rtl;

@@ -156,13 +156,25 @@ e nao tomados, JMP, opcode invalido, reset no meio da sequencia e a ausencia
 de `reg_write`/`mem_write` onde nao deve haver escrita. O codigo dos estados
 esta em [docs/control_unit.md](../docs/control_unit.md).
 
+## CPU integrada
+
+```bash
+GHDL=/caminho/para/ghdl bash tests/run_cpu.sh
+```
+
+`tb_cpu.vhd` instancia `cpu.vhd` com `cpu_test.mif` e roda o programa da ISA
+desde o reset. Acompanha as escritas pelas portas de observacao e verifica o
+estado final: PC = 0008, R3 = 0003, Mem[0] = 0003 e o JMP final no IR. A
+interface completa e a lista de arquivos estao em
+[docs/cpu.md](../docs/cpu.md).
+
 ## Executar todas as suites
 
 ```bash
 GHDL=/home/luccas/.local/opt/ghdl-6.0.0/ghdl-mcode-6.0.0-ubuntu24.04-x86_64/bin/ghdl bash tests/run_all.sh
 ```
 
-Com GHDL no PATH, basta `bash tests/run_all.sh`. São dez suítes, incluindo banco, registrador de instrução, PC, extensor,
+Com GHDL no PATH, basta `bash tests/run_all.sh`. São onze suítes, incluindo banco, registrador de instrução, PC, extensor,
 formatos, ULA, registradores da ULA e memória.
 
 

@@ -2,8 +2,9 @@
 
 O `datapath.vhd` liga todos os componentes existentes. Ele nao tem maquina de
 estados: os sinais de controle entram pela porta e serao gerados pela unidade
-de controle. As saidas `opcode`, `zero`, `overflow` e `fetched_word` devolvem
-informacao para a controle.
+de controle. As saidas `opcode`, `zero`, `overflow`, `fetched_word`,
+`reg_write_addr/data` e `mem_addr/write_data` devolvem informacao para a
+controle e para a observacao da execucao.
 
 ## Conexoes
 
