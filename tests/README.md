@@ -324,3 +324,24 @@ VHDL-2008 e executa 23 simulacoes, com probes de finish/assertion/timeout e
 logs em `.build/`. Preparacao Tcl e fontes/MIF testados localmente com GHDL;
 execucao real no ModelSim ainda pendente. Comandos e ponto de retomada em
 [docs/progresso.md](../docs/progresso.md).
+
+## Pausa e passo da CPU
+
+`bash tests/run_cpu_enable.sh` compara a execucao continua e pausada ciclo
+por ciclo, em seis cenarios. Incluido em run_all.sh (14 suites) e
+run_modelsim.do (29 simulacoes ao todo). clock_enable=1 por uma borda
+avanca um ciclo da FSM; reset funciona mesmo com clock_enable=0.
+
+## Controles da placa
+
+`bash tests/run_board_controls.sh` verifica reset, sincronizacao, filtro de
+repique e modos manual/continuo com debounce de 1 e 4 ciclos. Incluido em
+run_all.sh (agora15 suites) e run_modelsim.do (agora31 simulacoes).
+Teste digital do modulo; integracao CPU/top e placa ainda pendentes.
+
+## Top DE2-115
+
+`bash tests/run_top_de2_115.sh`: tres casos (demo/integracao, falha e todos
+os digitos hexadecimais), MIF temporarios gerados pelo runner. Incluido em
+run_all.sh (16 suites) e run_modelsim.do (34 simulacoes). Guia de operacao:
+[progresso](../docs/progresso.md#parte-5--top-e-observacao-23112026).

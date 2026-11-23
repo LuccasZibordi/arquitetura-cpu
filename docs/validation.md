@@ -76,3 +76,27 @@ nessas ferramentas. Nao ha projeto QPF/QSF/SDC nem top da DE2-115 no checkout.
 
 Os testes desta rodada permitem avancar para essa preparacao; nao comprovam
 funcionamento fisico, timing ou cumprimento de requisitos nao disponibilizados.
+
+## Parte 3 — 23/11/2026
+
+Habilitacao global implementada e validada: 14 suites GHDL, seis cenarios
+novos de equivalencia entre pausa/passo e execucao continua, quatro mutacoes
+rejeitadas e sintese GHDL aprovada (RAM 1024x16; aviso ram_init_file).
+Detalhes e limites em [progresso.md](progresso.md). ModelSim/Quartus/placa
+continuam pendentes no laboratorio.
+
+## Parte 4 — 23/11/2026
+
+board_controls: 15 suites GHDL passaram no total; novos testes com debounce
+1/4. Sintese do modulo passou com generic1/4/500000; tres mutacoes foram
+rejeitadas (reset direto, filtro ausente, repeticao por nivel). Preparacao
+Tcl aprovada, runner ampliado31 simulacoes. ModelSim/Quartus/placa nao
+executados. Contrato de integracao e limites em [progresso.md](progresso.md).
+
+## Parte 5 — 23/11/2026
+
+Top integra CPU/controles, LEDs e oito displays. 16 suites GHDL passaram,
+incluindo tres cenarios do top. Sintese top passou (RAM1024x16; aviso MIF).
+Revisao sem defeitos de RTL; testes ampliados para mux, sincronizacao e LEDs.
+Overflow=1 no LED nao exercitado nesta etapa. Preparacao Tcl passou; ModelSim
+34 casos preparado, execucao real e Quartus/placa pendentes. Ver progresso.

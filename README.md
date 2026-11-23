@@ -79,3 +79,5 @@ a unidade fisica ainda nao foi inspecionada nesta sessao.
 O [Quartus Lite 20.1](https://www.altera.com/downloads/fpga-development-tools/quartus-prime-lite-edition-design-software-version-20-1-windows)
 oferece o pacote de suporte Cyclone IV; conferir sua instalacao no computador
 usado para compilar. A compatibilidade deste projeto ainda depende da compilacao.
+
+Pendências para retomar em outro computador: [roteiro e dependências](docs/pendencias-e-dependencias.md).

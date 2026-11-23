@@ -27,7 +27,8 @@ entity cpu is
         reg_write_data : out std_logic_vector(15 downto 0);
         mem_write   : out std_logic;
         mem_addr    : out std_logic_vector(9 downto 0);
-        mem_write_data : out std_logic_vector(15 downto 0)
+        mem_write_data : out std_logic_vector(15 downto 0);
+        clock_enable : in std_logic := '1'
     );
 end entity cpu;
 
@@ -52,7 +53,7 @@ begin
     datapath_unit : entity work.datapath
         generic map (init_file => init_file)
         port map (
-            clk => clk, reset => reset, address_fault => fault_s,
+            clk => clk, reset => reset, clock_enable => clock_enable, address_fault => fault_s,
             pc_write => pc_write_c, ir_write => ir_write_c, reg_write => reg_write_c,
             reg_a_write => reg_a_write_c, reg_b_write => reg_b_write_c,
             alu_out_write => alu_out_write_c, rem_write => rem_write_c,
@@ -70,7 +71,7 @@ begin
 
     control : entity work.control_unit
         port map (
-            clk => clk, reset => reset, halt => fault_s, opcode => opcode_s, zero => zero_s,
+            clk => clk, reset => reset, clock_enable => clock_enable, halt => fault_s, opcode => opcode_s, zero => zero_s,
             pc_write => pc_write_c, ir_write => ir_write_c, reg_write => reg_write_c,
             reg_a_write => reg_a_write_c, reg_b_write => reg_b_write_c,
             alu_out_write => alu_out_write_c, rem_write => rem_write_c,
@@ -92,10 +93,10 @@ begin
     alu_result <= alu_s;
     rdm <= rdm_s;
     fetched <= fetched_s;
-    reg_write <= reg_write_c;
+    reg_write <= reg_write_c and clock_enable and not reset;
     reg_write_addr <= reg_sel_s;
     reg_write_data <= reg_data_s;
-    mem_write <= mem_write_c;
+    mem_write <= mem_write_c and clock_enable and not reset;
     mem_addr <= mem_addr_s;
     mem_write_data <= mem_word_s;
 end architecture rtl;

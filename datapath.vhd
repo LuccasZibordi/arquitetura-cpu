@@ -33,7 +33,8 @@ entity datapath is
         reg_write_addr : out std_logic_vector(2 downto 0);
         reg_write_data : out std_logic_vector(15 downto 0);
         mem_addr : out std_logic_vector(9 downto 0);
-        mem_write_data : out std_logic_vector(15 downto 0)
+        mem_write_data : out std_logic_vector(15 downto 0);
+        clock_enable : in std_logic := '1'
     );
 end entity datapath;
 
@@ -55,7 +56,7 @@ begin
     invalid_address <= '1' when
         (mem_read = '1' and mem_addr_sel = '0' and pc_current(15 downto 10) /= "000000") or
         (rem_write = '1' and alu_s(15 downto 10) /= "000000") else '0';
-    run_ok <= not (fault_latched or invalid_address or reset);
+    run_ok <= clock_enable and not (fault_latched or invalid_address or reset);
     address_fault <= fault_latched;
 
     process(clk, reset)
@@ -63,7 +64,7 @@ begin
         if reset = '1' then
             fault_latched <= '0';
         elsif rising_edge(clk) then
-            if invalid_address = '1' then
+            if clock_enable = '1' and invalid_address = '1' then
                 fault_latched <= '1';
             end if;
         end if;

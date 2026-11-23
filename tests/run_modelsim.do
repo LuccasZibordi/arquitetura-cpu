@@ -45,6 +45,13 @@ namespace eval cpu_regression {
             foreach image [glob [file join $root *.mif]] {
                 file copy $image .
             }
+            write_file top_fault.mif "DEPTH = 1024;\nWIDTH = 16;\nADDRESS_RADIX = HEX;\nDATA_RADIX = HEX;\nCONTENT BEGIN\n000 : A400;\n\[001..3FF\] : 0000;\nEND;"
+            set digits_mif "DEPTH = 1024;\nWIDTH = 16;\nADDRESS_RADIX = HEX;\nDATA_RADIX = HEX;\nCONTENT BEGIN\n"
+            for {set d 0} {$d < 16} {incr d} {
+                append digits_mif [format "%03X : F%X%X%X;\n" $d $d $d $d]
+            }
+            append digits_mif "\[010..3FF\] : 0000;\nEND;"
+            write_file top_digits.mif $digits_mif
             # As mesmas oito imagens usadas em run_address_fault.sh.
             set images {
                 {623F A001} {5205 723F A002} {6210 6440 A002}
@@ -101,6 +108,7 @@ end architecture;
                      reg_a reg_b alu alu_out memory_address_register memory_data_register
                      datapath decoder control_unit cpu}
             set sources {}
+            lappend rtl board_controls top_de2_115
             foreach unit $rtl {lappend sources [file join $root "$unit.vhd"]}
             foreach source [lsort [glob [file join $root tests tb_*.vhd]]] {
                 lappend sources $source
@@ -153,6 +161,21 @@ end architecture;
                     execute "address_$scenario" [concat $common [list -gscenario=$scenario work.tb_address_fault]]
                     incr count
                 }
+                foreach image {cpu_test.mif p1_arith.mif p2_limit.mif p3_mem.mif p4_r0_jump.mif address_1.mif} {
+                    set fault [expr {$image eq "address_1.mif" ? "true" : "false"}]
+                    execute "enable_$image" [concat $common [list -ginit_file=$image -gexpect_fault=$fault work.tb_cpu_enable]]
+                    incr count
+                }
+                foreach filter_cycles {1 4} {
+                    execute "controls_$filter_cycles" [concat $common [list -gfilter_cycles=$filter_cycles work.tb_board_controls]]
+                    incr count
+                }
+                foreach fault_case {false true} {
+                    execute "top_$fault_case" [concat $common [list -gfault_case=$fault_case work.tb_top_de2_115]]
+                    incr count
+                }
+                execute top_digits [concat $common [list -gdigits_case=true work.tb_top_de2_115]]
+                incr count
                 set summary "PASS: $count simulacoes; probes de finish/assertion/timeout verificados."
                 write_file summary.txt $summary
                 puts $summary

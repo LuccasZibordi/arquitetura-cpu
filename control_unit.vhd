@@ -20,7 +20,8 @@ entity control_unit is
         mem_addr_sel   : out std_logic;
         pc_sel         : out std_logic_vector(1 downto 0);
         wb_sel         : out std_logic;
-        state_out      : out std_logic_vector(3 downto 0)
+        state_out      : out std_logic_vector(3 downto 0);
+        clock_enable : in std_logic := '1'
     );
 end entity control_unit;
 
@@ -55,7 +56,7 @@ begin
         if reset = '1' then
             state <= FETCH0;
         elsif rising_edge(clk) then
-            if halt = '0' then
+            if halt = '0' and clock_enable = '1' then
                 state <= next_state;
             end if;
         end if;
