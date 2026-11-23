@@ -124,10 +124,10 @@ Troca o PC pelo endereco de 12 bits da instrucao, sem comparar nada.
 ### Instrucao invalida
 
 Os opcodes 1011 a 1111 nao correspondem a nenhuma instrucao. Se um deles
-aparecer, nada acontece: o PC, os registradores e a memoria ficam como
-estavam. A ISA nao tem um HALT; para encerrar um programa, use `JMP` para o
-proprio endereco e observe o resultado nos registradores, na memoria ou nos
-displays da FPGA.
+aparecer, a instrucao e ignorada: nenhum registrador nem memoria e alterado,
+mas o PC avanca para a proxima palavra. A ISA nao tem um HALT; para encerrar
+um programa, use `JMP` para o proprio endereco e observe o resultado nos
+registradores, na memoria ou nos displays da FPGA.
 
 ## Consulta rapida
 
@@ -146,9 +146,9 @@ escrever em R0 nao tem efeito.
 
 ## Programa de demonstracao
 
-Ele soma 1 + 2 + 3, guarda o 6 resultante na memoria e termina parado. A ideia
-e: R1 conta de 3 ate 0, R2 vale 1 e R3 acumula a soma. A cada volta, R3 ganha
-1 e R1 perde 1. Quando R1 chega a zero, o BEQ pula para o ST.
+Ele soma 1 tres vezes, guarda o 3 resultante na memoria e termina parado. A
+ideia e: R1 conta de 3 ate 0, R2 vale 1 e R3 acumula a soma. A cada volta, R3
+ganha 1 e R1 perde 1. Quando R1 chega a zero, o BEQ pula para o ST.
 
 | Endereco | Codigo | Instrucao |
 | --- | --- | --- |
@@ -159,7 +159,7 @@ e: R1 conta de 3 ate 0, R2 vale 1 e R3 acumula a soma. A cada volta, R3 ganha
 | 4 | 1250 | SUB R1,R1,R2 -- diminui o contador |
 | 5 | 8201 | BEQ R1,R0,1 -- se acabou, vai para o endereco 7 |
 | 6 | A003 | JMP 3 -- senao, volta para somar de novo |
-| 7 | 7600 | ST R3,0(R0) -- grava 6 na memoria no endereco 0 |
+| 7 | 7600 | ST R3,0(R0) -- grava 3 na memoria no endereco 0 |
 | 8 | A008 | JMP 8 -- fim: PC fica parado aqui |
 
-Ao final, R3 = 0006, a memoria no endereco 0 = 0006 e PC = 0008.
+Ao final, R3 = 0003, a memoria no endereco 0 = 0003 e PC = 0008.

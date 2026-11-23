@@ -82,16 +82,16 @@ RAM, captura no RDM e so entao escrita no banco.
 | JMP | busca (2) -> carga do PC com `end` |
 | Invalida | busca (2) -> sem escrita |
 
-Na busca da instrucao invalida a controle deve manter `pc_write=0`: o campo
-`fetched_word` ja contem a palavra lida e permite detectar o opcode
-`1111` antes de avancar o PC.
+O campo `fetched_word` devolve a palavra lida pela RAM e pode ser usado para
+observacao. A regra de opcode invalido e decidida pela unidade de controle:
+a instrucao e ignorada e o PC avanca normalmente em `FETCH1`.
 
 ## Testes
 
 `tests/tb_datapath.vhd` dirige os controles borda a borda e verifica a busca,
 a captura de operandos, o resultado da ULA, a ordem entre `alu_out` e REM, a
 gravacao e a leitura da memoria, o retorno ao banco, o desvio tomado e nao
-tomado, o JMP e o congelamento do PC em opcode invalido.
+tomado, o JMP e a preservacao do PC quando a controle nao habilita `pc_write`.
 
 ```bash
 GHDL=/caminho/para/ghdl bash tests/run_datapath.sh

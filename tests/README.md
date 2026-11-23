@@ -143,13 +143,26 @@ o retorno de alu_out ou RDM ao banco, um BEQ nao tomado, um BEQ tomado, um JMP
 e a preservacao do PC diante de um opcode invalido. O teste tambem confirma que
 o REM captura a saida combinacional da ULA, e nao o alu_out antigo.
 
+## Unidade de controle
+
+```bash
+GHDL=/caminho/para/ghdl bash tests/run_control_unit.sh
+```
+
+`tb_control_unit.vhd` testa `decoder.vhd` e `control_unit.vhd` isolados: dirige
+`opcode` e `zero`, e confere `state_out` e os 14 sinais de controle em cada
+estado. A sequencia cobre ADD/SUB/AND/OR/SLT, ADDI, LD, ST, BEQ e BNE tomados
+e nao tomados, JMP, opcode invalido, reset no meio da sequencia e a ausencia
+de `reg_write`/`mem_write` onde nao deve haver escrita. O codigo dos estados
+esta em [docs/control_unit.md](../docs/control_unit.md).
+
 ## Executar todas as suites
 
 ```bash
 GHDL=/home/luccas/.local/opt/ghdl-6.0.0/ghdl-mcode-6.0.0-ubuntu24.04-x86_64/bin/ghdl bash tests/run_all.sh
 ```
 
-Com GHDL no PATH, basta `bash tests/run_all.sh`. São nove suítes, incluindo banco, registrador de instrução, PC, extensor,
+Com GHDL no PATH, basta `bash tests/run_all.sh`. São dez suítes, incluindo banco, registrador de instrução, PC, extensor,
 formatos, ULA, registradores da ULA e memória.
 
 
