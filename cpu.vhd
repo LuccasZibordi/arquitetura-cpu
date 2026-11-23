@@ -9,6 +9,7 @@ entity cpu is
     );
     port (
         clk, reset : in std_logic;
+        address_fault : out std_logic := '0';
 
         -- Observacao da execucao
         pc          : out std_logic_vector(15 downto 0);
@@ -31,6 +32,7 @@ entity cpu is
 end entity cpu;
 
 architecture rtl of cpu is
+    signal fault_s : std_logic;
     signal pc_write_c, ir_write_c, reg_write_c : std_logic;
     signal reg_a_write_c, reg_b_write_c, alu_out_write_c : std_logic;
     signal rem_write_c, rdm_write_c : std_logic;
@@ -50,7 +52,7 @@ begin
     datapath_unit : entity work.datapath
         generic map (init_file => init_file)
         port map (
-            clk => clk, reset => reset,
+            clk => clk, reset => reset, address_fault => fault_s,
             pc_write => pc_write_c, ir_write => ir_write_c, reg_write => reg_write_c,
             reg_a_write => reg_a_write_c, reg_b_write => reg_b_write_c,
             alu_out_write => alu_out_write_c, rem_write => rem_write_c,
@@ -68,7 +70,7 @@ begin
 
     control : entity work.control_unit
         port map (
-            clk => clk, reset => reset, opcode => opcode_s, zero => zero_s,
+            clk => clk, reset => reset, halt => fault_s, opcode => opcode_s, zero => zero_s,
             pc_write => pc_write_c, ir_write => ir_write_c, reg_write => reg_write_c,
             reg_a_write => reg_a_write_c, reg_b_write => reg_b_write_c,
             alu_out_write => alu_out_write_c, rem_write => rem_write_c,
@@ -78,6 +80,7 @@ begin
             pc_sel => pc_sel_c, wb_sel => wb_sel_c, state_out => state_s
         );
 
+    address_fault <= fault_s;
     pc <= pc_s;
     instruction <= instruction_s;
     state <= state_s;

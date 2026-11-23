@@ -6,6 +6,7 @@ use ieee.std_logic_1164.all;
 entity control_unit is
     port (
         clk, reset : in std_logic;
+        halt : in std_logic := '0';
         opcode     : in std_logic_vector(3 downto 0);
         zero       : in std_logic;
 
@@ -54,7 +55,9 @@ begin
         if reset = '1' then
             state <= FETCH0;
         elsif rising_edge(clk) then
-            state <= next_state;
+            if halt = '0' then
+                state <= next_state;
+            end if;
         end if;
     end process;
 
@@ -78,85 +81,87 @@ begin
         wb_sel <= '0';
         next_state <= FETCH0;
 
-        case state is
-            when FETCH0 =>
-                -- A RAM entrega a palavra so na proxima borda.
-                mem_read <= '1';
-                next_state <= FETCH1;
+        if halt = '0' then
+            case state is
+                when FETCH0 =>
+                    -- A RAM entrega a palavra so na proxima borda.
+                    mem_read <= '1';
+                    next_state <= FETCH1;
 
-            when FETCH1 =>
-                ir_write <= '1';
-                pc_write <= '1';
-                next_state <= DECODE;
-
-            when DECODE =>
-                read_addr2_sel <= dec_read_addr2_sel;
-                if dec_is_invalid = '0' and dec_is_jump = '0' then
-                    reg_a_write <= '1';
-                    reg_b_write <= '1';
-                end if;
-                if dec_is_jump = '1' then
+                when FETCH1 =>
+                    ir_write <= '1';
                     pc_write <= '1';
-                    pc_sel <= "10";
+                    next_state <= DECODE;
+
+                when DECODE =>
+                    read_addr2_sel <= dec_read_addr2_sel;
+                    if dec_is_invalid = '0' and dec_is_jump = '0' then
+                        reg_a_write <= '1';
+                        reg_b_write <= '1';
+                    end if;
+                    if dec_is_jump = '1' then
+                        pc_write <= '1';
+                        pc_sel <= "10";
+                        next_state <= FETCH0;
+                    elsif dec_is_invalid = '1' then
+                        -- Instrucao ignorada: o PC ja avancou em FETCH1.
+                        next_state <= FETCH0;
+                    elsif dec_is_branch = '1' then
+                        next_state <= CMP;
+                    elsif dec_is_load = '1' or dec_is_store = '1' then
+                        next_state <= ADDR;
+                    else
+                        next_state <= EXEC;
+                    end if;
+
+                when EXEC =>
+                    alu_op <= dec_alu_op;
+                    alu_b_sel <= dec_alu_b_sel;
+                    alu_out_write <= '1';
+                    next_state <= WB;
+
+                when ADDR =>
+                    alu_op <= dec_alu_op;
+                    alu_b_sel <= dec_alu_b_sel;
+                    alu_out_write <= '1';
+                    rem_write <= '1';
+                    if dec_is_load = '1' then
+                        next_state <= READ_MEM;
+                    else
+                        next_state <= WRITE_MEM;
+                    end if;
+
+                when READ_MEM =>
+                    mem_read <= '1';
+                    mem_addr_sel <= '1';
+                    next_state <= LATCH_RDM;
+
+                when LATCH_RDM =>
+                    rdm_write <= '1';
+                    next_state <= WB;
+
+                when WRITE_MEM =>
+                    mem_write <= '1';
+                    mem_addr_sel <= '1';
                     next_state <= FETCH0;
-                elsif dec_is_invalid = '1' then
-                    -- Instrucao ignorada: o PC ja avancou em FETCH1.
+
+                when CMP =>
+                    alu_op <= dec_alu_op;
+                    alu_b_sel <= dec_alu_b_sel;
+                    -- alu_op = SUB e alu_b_sel = 0 vem do decoder; mantidos aqui
+                    -- para que zero continue refletindo a comparacao de A e B.
+                    if zero = dec_branch_on_zero then
+                        pc_write <= '1';
+                        pc_sel <= "01";
+                    end if;
                     next_state <= FETCH0;
-                elsif dec_is_branch = '1' then
-                    next_state <= CMP;
-                elsif dec_is_load = '1' or dec_is_store = '1' then
-                    next_state <= ADDR;
-                else
-                    next_state <= EXEC;
-                end if;
 
-            when EXEC =>
-                alu_op <= dec_alu_op;
-                alu_b_sel <= dec_alu_b_sel;
-                alu_out_write <= '1';
-                next_state <= WB;
-
-            when ADDR =>
-                alu_op <= dec_alu_op;
-                alu_b_sel <= dec_alu_b_sel;
-                alu_out_write <= '1';
-                rem_write <= '1';
-                if dec_is_load = '1' then
-                    next_state <= READ_MEM;
-                else
-                    next_state <= WRITE_MEM;
-                end if;
-
-            when READ_MEM =>
-                mem_read <= '1';
-                mem_addr_sel <= '1';
-                next_state <= LATCH_RDM;
-
-            when LATCH_RDM =>
-                rdm_write <= '1';
-                next_state <= WB;
-
-            when WRITE_MEM =>
-                mem_write <= '1';
-                mem_addr_sel <= '1';
-                next_state <= FETCH0;
-
-            when CMP =>
-                alu_op <= dec_alu_op;
-                alu_b_sel <= dec_alu_b_sel;
-                -- alu_op = SUB e alu_b_sel = 0 vem do decoder; mantidos aqui
-                -- para que zero continue refletindo a comparacao de A e B.
-                if zero = dec_branch_on_zero then
-                    pc_write <= '1';
-                    pc_sel <= "01";
-                end if;
-                next_state <= FETCH0;
-
-            when WB =>
-                wb_sel <= dec_wb_sel;
-                reg_write <= '1';
-                next_state <= FETCH0;
-        end case;
+                when WB =>
+                    wb_sel <= dec_wb_sel;
+                    reg_write <= '1';
+                    next_state <= FETCH0;
+            end case;
+        end if;
     end process;
 
     state_out <= x"0" when state = FETCH0  else

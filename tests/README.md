@@ -150,7 +150,7 @@ GHDL=/caminho/para/ghdl bash tests/run_control_unit.sh
 ```
 
 `tb_control_unit.vhd` testa `decoder.vhd` e `control_unit.vhd` isolados: dirige
-`opcode` e `zero`, e confere `state_out` e os 14 sinais de controle em cada
+`opcode` e `zero`, e confere `state_out` e os 16 sinais de controle em cada
 estado. A sequencia cobre ADD/SUB/AND/OR/SLT, ADDI, LD, ST, BEQ e BNE tomados
 e nao tomados, JMP, opcode invalido, reset no meio da sequencia e a ausencia
 de `reg_write`/`mem_write` onde nao deve haver escrita. O codigo dos estados
@@ -164,7 +164,8 @@ GHDL=/caminho/para/ghdl bash tests/run_cpu.sh
 
 `tb_cpu.vhd` instancia `cpu.vhd` com `cpu_test.mif` e roda o programa da ISA
 desde o reset. Acompanha as escritas pelas portas de observacao e verifica o
-estado final: PC = 0008, R3 = 0003, Mem[0] = 0003 e o JMP final no IR. A
+estado final: R3 = R4 = Mem[16] = 0003 e JMP 9 no IR. Executa duas vezes
+por reset, verifica codigo inicial preservado e uma escrita por execucao. A
 interface completa e a lista de arquivos estao em
 [docs/cpu.md](../docs/cpu.md).
 
@@ -187,7 +188,7 @@ limite de 500 ciclos por programa.
 GHDL=/home/luccas/.local/opt/ghdl-6.0.0/ghdl-mcode-6.0.0-ubuntu24.04-x86_64/bin/ghdl bash tests/run_all.sh
 ```
 
-Com GHDL no PATH, basta `bash tests/run_all.sh`. São doze suítes, incluindo banco, registrador de instrução, PC, extensor,
+Com GHDL no PATH, basta `bash tests/run_all.sh`. São treze suítes, incluindo banco, registrador de instrução, PC, extensor,
 formatos, ULA, registradores da ULA e memória.
 
 
@@ -303,3 +304,23 @@ faixas inclusivas, seguindo o formato do arquivo de exemplo.
 O testbench verifica a inicialização nos limites e na faixa zerada, a
 escrita, a prioridade da escrita sobre uma leitura simultânea, a retenção,
 a latência entre REM, RAM e RDM e a preservação da RAM após reset.
+
+## Enderecos fora da RAM
+
+`bash tests/run_address_fault.sh` executa oito cenarios na CPU real:
+LD/ST com endereco FFFF e 0400, JMP 0400, BEQ para FFFF, busca sequencial
+apos 03FF e acesso valido LD/ST/JMP em 03FF. As imagens MIF sao geradas
+pelo runner no diretorio temporario. Confere bloqueio da primeira leitura invalida, bloqueio de escrita, falha
+retida, CPU parada e retomada por reset. O caso valido nao pode gerar falha.
+
+O programa 4 tambem confere a sequencia de instrucoes dos saltos, com
+resultado dependente do caminho. Todos os programas contam escritas na RAM,
+para detectar inclusive uma escrita indevida de zero.
+
+## ModelSim do laboratorio
+
+Runner: `tests/run_modelsim.do`, sem dependencia de Python/Bash. Compila em
+VHDL-2008 e executa 23 simulacoes, com probes de finish/assertion/timeout e
+logs em `.build/`. Preparacao Tcl e fontes/MIF testados localmente com GHDL;
+execucao real no ModelSim ainda pendente. Comandos e ponto de retomada em
+[docs/progresso.md](../docs/progresso.md).

@@ -36,6 +36,10 @@ architecture sim of tb_program is
     signal mem_addr : std_logic_vector(9 downto 0);
     signal mem_write_data : std_logic_vector(15 downto 0);
 
+    type trace_t is array (natural range <>) of natural;
+    constant branch_trace : trace_t := (0, 1, 2, 4, 6, 7, 8, 9, 10, 9, 10, 9, 10, 11, 12, 13);
+    signal trace_count : natural := 0;
+    signal stores : natural := 0;
     signal seen_regs : regs_t := (others => x"0000");
     signal last_mem_addr : std_logic_vector(9 downto 0) := (others => '0');
     signal last_mem_data : std_logic_vector(15 downto 0) := x"0000";
@@ -65,10 +69,20 @@ begin
     begin
         wait until rising_edge(clk);
         if reset = '0' then
+            if program = 4 and state = x"2" then
+                if trace_count < branch_trace'length then
+                    assert to_integer(unsigned(pc)) = branch_trace(trace_count) + 1
+                        report "caminho errado no programa de saltos" severity failure;
+                    trace_count <= trace_count + 1;
+                else
+                    assert instruction = x"A00D" report "saiu do loop final" severity failure;
+                end if;
+            end if;
             if reg_write = '1' and reg_write_addr /= "000" then
                 seen_regs(to_integer(unsigned(reg_write_addr))) <= reg_write_data;
             end if;
             if mem_write = '1' then
+                stores <= stores + 1;
                 last_mem_addr <= mem_addr;
                 last_mem_data <= mem_write_data;
             end if;
@@ -96,7 +110,7 @@ begin
             when 4 =>
                 exp_regs := (x"0000", x"0003", x"0003", x"0000", x"0000",
                              x"0000", x"0000", x"0000");
-                exp_pc := x"0007";
+                exp_pc := x"000D";
             when others =>
                 assert false report "programa desconhecido" severity failure;
         end case;
@@ -106,7 +120,8 @@ begin
             report "reset nao levou ao estado inicial" severity failure;
         reset <= '0';
 
-        while (pc /= exp_pc or seen_regs /= exp_regs) and cycles < 500 loop
+        while (pc /= exp_pc or seen_regs /= exp_regs or
+               instruction /= (x"A000" or exp_pc) or state /= x"0") and cycles < 500 loop
             wait until rising_edge(clk);
             wait for 1 ns;
             cycles := cycles + 1;
@@ -129,16 +144,20 @@ begin
             severity failure;
 
         if program = 3 then
-            assert last_mem_addr = "0000010001" and last_mem_data = x"8000"
+            assert stores = 1 and last_mem_addr = "0000010001" and last_mem_data = x"8000"
                 report "Mem[17] final errado: addr=" & to_hstring(last_mem_addr) &
                        " dado=" & to_hstring(last_mem_data)
                 severity failure;
         else
-            assert last_mem_data = x"0000"
+            assert stores = 0
                 report "programa " & integer'image(program) & " gravou na memoria"
                 severity failure;
         end if;
 
+        if program = 4 then
+            assert trace_count = branch_trace'length
+                report "sequencia de saltos incompleta" severity failure;
+        end if;
         report "PASS: programa " & integer'image(program) & " (" &
                program_file(program) & "), " & integer'image(cycles) & " ciclos"
             severity note;

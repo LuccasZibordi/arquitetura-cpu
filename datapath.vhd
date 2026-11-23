@@ -12,6 +12,7 @@ entity datapath is
     port (
         clk   : in std_logic;
         reset : in std_logic;
+        address_fault : out std_logic := '0';
 
         pc_write, ir_write, reg_write : in std_logic;
         reg_a_write, reg_b_write, alu_out_write : in std_logic;
@@ -37,6 +38,8 @@ entity datapath is
 end entity datapath;
 
 architecture rtl of datapath is
+    signal fault_latched : std_logic := '0';
+    signal invalid_address, run_ok : std_logic;
     signal pc_current, pc_plus_one, branch_target, jmp_target, pc_next : std_logic_vector(15 downto 0);
     signal instruction_word : std_logic_vector(15 downto 0) := (others => '0');
     signal mem_address, rem_address : std_logic_vector(9 downto 0);
@@ -46,6 +49,26 @@ architecture rtl of datapath is
     signal read1, read2 : std_logic_vector(15 downto 0);
     signal a_value, b_value, alu_b, alu_s, out_value, rdm_value, wb_value : std_logic_vector(15 downto 0);
 begin
+    -- Verifica os 16 bits ANTES de truncar para a porta fisica da RAM.
+    -- O controle recebe somente a falha registrada: nao ha realimentacao
+    -- combinacional entre fault e os enables que originam a verificacao.
+    invalid_address <= '1' when
+        (mem_read = '1' and mem_addr_sel = '0' and pc_current(15 downto 10) /= "000000") or
+        (rem_write = '1' and alu_s(15 downto 10) /= "000000") else '0';
+    run_ok <= not (fault_latched or invalid_address or reset);
+    address_fault <= fault_latched;
+
+    process(clk, reset)
+    begin
+        if reset = '1' then
+            fault_latched <= '0';
+        elsif rising_edge(clk) then
+            if invalid_address = '1' then
+                fault_latched <= '1';
+            end if;
+        end if;
+    end process;
+
     opcode <= instruction_word(15 downto 12);
     ri <= instruction_word(11 downto 9);
     rj <= instruction_word(8 downto 6);
@@ -66,20 +89,20 @@ begin
     wb_value <= rdm_value when wb_sel = '1' else out_value;
 
     pc_unit : entity work.PC
-        port map (clk => clk, reset => reset, pc_write => pc_write,
+        port map (clk => clk, reset => reset, pc_write => (pc_write and run_ok),
                   next_pc => pc_next, pc_out => pc_current);
 
     ir_unit : entity work.instruction_register
-        port map (clk => clk, reset => reset, ir_write => ir_write,
+        port map (clk => clk, reset => reset, ir_write => (ir_write and run_ok),
                   instruction_in => mem_data, instruction_out => instruction_word);
 
     ram : entity work.memory
         generic map (init_file => init_file)
-        port map (clk => clk, read_enable => mem_read, write_enable => mem_write,
+        port map (clk => clk, read_enable => (mem_read and run_ok), write_enable => (mem_write and run_ok),
                   address => mem_address, data_in => store_data, data_out => mem_data);
 
     regs : entity work.register_file
-        port map (clk => clk, reset => reset, reg_write => reg_write,
+        port map (clk => clk, reset => reset, reg_write => (reg_write and run_ok),
                   read_addr1 => rj, read_addr2 => addr2, write_addr => ri,
                   write_data => wb_value, read_data1 => read1, read_data2 => read2);
 
@@ -87,11 +110,11 @@ begin
         port map (immediate_in => instruction_word(5 downto 0), immediate_out => imm16);
 
     reg_a_unit : entity work.reg_a
-        port map (clk => clk, reset => reset, write_enable => reg_a_write,
+        port map (clk => clk, reset => reset, write_enable => (reg_a_write and run_ok),
                   data_in => read1, data_out => a_value);
 
     reg_b_unit : entity work.reg_b
-        port map (clk => clk, reset => reset, write_enable => reg_b_write,
+        port map (clk => clk, reset => reset, write_enable => (reg_b_write and run_ok),
                   data_in => read2, data_out => b_value);
 
     alu_unit : entity work.alu
@@ -99,15 +122,15 @@ begin
                   S => alu_s, Zero => zero, Overflow => overflow);
 
     alu_out_unit : entity work.alu_out
-        port map (clk => clk, reset => reset, write_enable => alu_out_write,
+        port map (clk => clk, reset => reset, write_enable => (alu_out_write and run_ok),
                   data_in => alu_s, data_out => out_value);
 
     rem_unit : entity work.memory_address_register
-        port map (clk => clk, reset => reset, write_enable => rem_write,
+        port map (clk => clk, reset => reset, write_enable => (rem_write and run_ok),
                   data_in => alu_s(9 downto 0), data_out => rem_address);
 
     rdm_unit : entity work.memory_data_register
-        port map (clk => clk, reset => reset, write_enable => rdm_write,
+        port map (clk => clk, reset => reset, write_enable => (rdm_write and run_ok),
                   data_in => mem_data, data_out => rdm_value);
 
     pc_out <= pc_current;

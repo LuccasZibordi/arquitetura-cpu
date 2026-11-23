@@ -19,8 +19,10 @@ architecture sim of tb_cpu is
     signal mem_addr : std_logic_vector(9 downto 0);
     signal mem_write_data : std_logic_vector(15 downto 0);
 
+    signal last_r4 : std_logic_vector(15 downto 0) := x"0000";
+    signal store_count : natural := 0;
     signal last_r3 : std_logic_vector(15 downto 0) := x"0000";
-    signal last_mem0 : std_logic_vector(15 downto 0) := x"0000";
+    signal last_mem16 : std_logic_vector(15 downto 0) := x"0000";
 begin
     clock : process
     begin
@@ -43,49 +45,57 @@ begin
             mem_write_data => mem_write_data
         );
 
-    -- Registra a ultima escrita em R3 e na palavra 0 da memoria.
     monitor : process
     begin
         wait until rising_edge(clk);
-        if reset = '0' then
+        if reset = '1' then
+            last_r3 <= x"0000";
+            last_r4 <= x"0000";
+            last_mem16 <= x"0000";
+            store_count <= 0;
+        else
             if reg_write = '1' and reg_write_addr = "011" then
                 last_r3 <= reg_write_data;
             end if;
-            if mem_write = '1' and mem_addr = "0000000000" then
-                last_mem0 <= mem_write_data;
+            if reg_write = '1' and reg_write_addr = "100" then
+                last_r4 <= reg_write_data;
+            end if;
+            if mem_write = '1' then
+                assert mem_addr = "0000010000"
+                    report "demo escreveu fora da area de dados (Mem[16])" severity failure;
+                last_mem16 <= mem_write_data;
+                store_count <= store_count + 1;
             end if;
         end if;
     end process;
 
     stimulus : process
-        variable cycles : integer := 0;
+        variable cycles : natural;
     begin
-        wait for 1 ns;
-        assert pc = x"0000" and state = x"0"
-            report "reset nao levou ao estado inicial" severity failure;
-        reset <= '0';
-
-        while (last_mem0 = x"0000" or pc /= x"0008" or instruction /= x"A008")
-              and cycles < 300 loop
+        for execution in 1 to 2 loop
+            reset <= '1';
             wait until rising_edge(clk);
-            cycles := cycles + 1;
+            wait until falling_edge(clk);
+            assert pc = x"0000" and state = x"0" severity failure;
+            reset <= '0';
+            wait until rising_edge(clk);
+            wait until rising_edge(clk);
+            wait for 1 ns;
+            assert instruction = x"5203"
+                report "reset encontrou codigo sobrescrito" severity failure;
+            cycles := 0;
+            while not (pc = x"0009" and instruction = x"A009" and state = x"0")
+                  and cycles < 300 loop
+                wait until rising_edge(clk); wait for 1 ns;
+                cycles := cycles + 1;
+            end loop;
+            assert cycles < 300 report "timeout na demo" severity failure;
+            assert last_r3 = x"0003" and last_r4 = x"0003"
+                and last_mem16 = x"0003" and store_count = 1
+                report "demo: soma, releitura ou numero de escritas incorreto" severity failure;
+            wait until falling_edge(clk);
         end loop;
-        wait for 1 ns;
-
-        assert cycles < 300
-            report "programa nao terminou: pc=" & to_hstring(pc) & " ciclos=" & integer'image(cycles)
-            severity failure;
-        assert pc = x"0008"
-            report "PC final diferente de 0008" severity failure;
-        assert instruction = x"A008"
-            report "IR final nao contem o JMP 8" severity failure;
-        assert last_r3 = x"0003"
-            report "R3 final diferente de 3: " & to_hstring(last_r3) severity failure;
-        assert last_mem0 = x"0003"
-            report "Mem[0] final diferente de 3: " & to_hstring(last_mem0) severity failure;
-
-        report "PASS: cpu integrada (demo desde o reset, PC=0008, R3=3, Mem[0]=3)"
-            severity note;
+        report "PASS: demo executada duas vezes por reset, Mem[16]=R3=R4=3";
         finish;
     end process;
 end architecture sim;

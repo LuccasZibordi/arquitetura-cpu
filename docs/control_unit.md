@@ -2,7 +2,7 @@
 
 O `control_unit.vhd` comanda o `datapath.vhd`. A traducao do opcode em
 propriedades da instrucao esta em `decoder.vhd`; a maquina de estados fica no
-`control_unit`. Entradas: `clk`, `reset`, `opcode` e `zero`. Saidas: os 14
+`control_unit`. Entradas: `clk`, `reset`, `opcode`, `zero` e `halt`. Saidas: os 16
 sinais de controle do datapath mais `state_out`, com o estado codificado de 0
 a 9.
 
@@ -87,7 +87,14 @@ capturas indevidas em estados em que o sinal nao tem significado.
 GHDL=/caminho/para/ghdl bash tests/run_control_unit.sh
 ```
 
-`tb_control_unit.vhd` dirige `opcode` e `zero` e confere `state_out` e os 14
+`tb_control_unit.vhd` dirige `opcode` e `zero` e confere `state_out` e os 16
 sinais em cada estado. Cobre ADD/SUB/AND/OR/SLT, ADDI, LD, ST, BEQ e BNE
 tomados e nao tomados, JMP, opcode invalido, reset no meio da sequencia e a
 ausencia de `reg_write`/`mem_write` nos estados que nao escrevem.
+
+## Parada por falha
+
+`halt=1` congela o estado e zera todos os enables/seletores. Na CPU, recebe
+a falha de endereco registrada pelo datapath. Reset tem prioridade e volta
+a FETCH0; a falha do datapath tambem e limpa. `halt` tem padrao 0 nas
+instanciacoes que testam somente o controle.

@@ -87,7 +87,7 @@ tambem serve para subtrair pequenos valores.
 ### LD - le da memoria
 
 Soma o imediato a Rj, usa o resultado como endereco e guarda a palavra lida
-em Ri. O endereco e limitado a 0-1023 porque a RAM tem 1024 palavras.
+em Ri. Enderecos fora de 0-1023 causam a falha descrita abaixo.
 
 `LD R1, 2(R0)` fica `6202`: R1 recebe o valor guardado na memoria no
 endereco 2.
@@ -129,6 +129,20 @@ mas o PC avanca para a proxima palavra. A ISA nao tem um HALT; para encerrar
 um programa, use `JMP` para o proprio endereco e observe o resultado nos
 registradores, na memoria ou nos displays da FPGA.
 
+## Enderecos fora da RAM
+
+A RAM aceita somente 0000–03FF (0–1023), com enderecamento por palavra.
+O endereco efetivo de LD/ST e calculado em 16 bits (soma modular), e os
+16 bits sao verificados antes de selecionar os 10 bits da RAM. Imediatos
+negativos continuam validos quando o resultado esta dentro da faixa.
+
+Um LD/ST fora da faixa nao acessa a RAM nem escreve o destino do LD.
+Busca de instrucao fora da faixa tambem e bloqueada, inclusive depois de
+JMP, BEQ/BNE ou incremento sequencial. O topo sinaliza `address_fault=1`
+e para a execucao ate reset. O PC pode mostrar o alvo invalido antes da
+falha na busca; nao ha redirecionamento para outro endereco por truncamento.
+O reset limpa a falha e os registradores, mas preserva os dados da RAM.
+
 ## Consulta rapida
 
 | Opcode | Instrucao | Opcode | Instrucao |
@@ -159,7 +173,10 @@ ganha 1 e R1 perde 1. Quando R1 chega a zero, o BEQ pula para o ST.
 | 4 | 1250 | SUB R1,R1,R2 -- diminui o contador |
 | 5 | 8201 | BEQ R1,R0,1 -- se acabou, vai para o endereco 7 |
 | 6 | A003 | JMP 3 -- senao, volta para somar de novo |
-| 7 | 7600 | ST R3,0(R0) -- grava 3 na memoria no endereco 0 |
-| 8 | A008 | JMP 8 -- fim: PC fica parado aqui |
+| 7 | 7610 | ST R3,16(R0) -- grava o resultado fora do codigo |
+| 8 | 6810 | LD R4,16(R0) -- confirma o dado gravado |
+| 9 | A009 | JMP 9 -- loop final |
 
-Ao final, R3 = 0003, a memoria no endereco 0 = 0003 e PC = 0008.
+Ao final, R3 = R4 = 0003 e Mem[16] = 0003. O programa repete JMP 9;
+o PC alterna entre 0009 e 000A durante busca/execucao. O teste observa
+0009 depois do salto. O codigo permanece intacto para repetir por reset.

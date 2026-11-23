@@ -26,7 +26,7 @@ flowchart LR
     RA --> ULA[ULA 16 bits]
     MUXB --> ULA
     ULA -->|S| AOUT[alu_out]
-    AOUT --> REM
+    ULA -->|S 9..0, apos verificar faixa| REM
     AOUT -->|retorno| MUXW{Selecao escrita}
     RDM --> MUXW
     MUXW -->|write_data| RF
@@ -50,7 +50,7 @@ mesmo ciclo.
 | `reg_write` | Escreve `write_data` em Ri no banco |
 | `reg_a_write` / `reg_b_write` | Capturam Rj e Rk/Ri nos registradores da ULA |
 | `alu_out_write` | Captura o resultado combinacional da ULA |
-| `rem_write` | Captura os 10 bits baixos da saida da ULA no REM |
+| `rem_write` | Captura os 10 bits baixos da ULA no REM se o endereco completo for valido |
 | `rdm_write` | Captura `data_out` da RAM no RDM |
 | `mem_read` / `mem_write` | Leitura/escrita da RAM no endereco selecionado |
 | `alu_op` | Seletor interno da ULA: 000 ADD, 001 SUB, 010 AND, 011 OR, 100 SLT |
@@ -97,3 +97,11 @@ tomado, o JMP e a preservacao do PC quando a controle nao habilita `pc_write`.
 ```bash
 GHDL=/caminho/para/ghdl bash tests/run_datapath.sh
 ```
+
+## Protecao de endereco
+
+`address_fault` e uma saida registrada, limpa por reset. O datapath verifica
+PC[15:10] durante a busca e S[15:10] durante a captura do REM. Qualquer bit
+alto indica endereco fora da RAM; todos os enables internos sao bloqueados
+ja nessa borda. A falha fica retida ate reset, e a CPU liga essa saida ao
+`halt` do controle. Reset bloqueia acessos mas nao reinicializa a RAM.

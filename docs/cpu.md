@@ -32,6 +32,7 @@ flowchart TB
 
 | Porta | Largura | Funcao |
 | --- | --- | --- |
+| `address_fault` | 1 | Falha de endereco retida ate reset; CPU parada |
 | `pc` | 16 | Endereco atual do PC |
 | `instruction` | 16 | Palavra no IR |
 | `state` | 4 | Estado da FSM, codificado de 0 a 9 |
@@ -62,7 +63,7 @@ ghdl -e --std=08 cpu
 ```
 
 Para simular, `cpu_test.mif` deve estar no diretorio de execucao. No Quartus,
-todos os `.vhd` entram no projeto e `cpu_test.mif` (ou outro MIF passado no
+os 15 fontes RTL da lista acima entram no projeto (excluir `tests/`) e `cpu_test.mif` (ou outro MIF passado no
 generic) vincula a RAM inicial.
 
 ## Teste integrado
@@ -73,8 +74,21 @@ GHDL=/caminho/para/ghdl bash tests/run_cpu.sh
 
 `tb_cpu.vhd` aplica reset, roda o programa de demonstracao de `docs/isa.md`
 carregado em `cpu_test.mif` e observa as escritas pelas portas de depuracao.
-O programa soma 1 tres vezes em R3, grava o resultado na memoria e termina em
-`JMP 8`. O teste confere `PC=0008`, `R3=0003`, `Mem[0]=0003` e o JMP final no IR.
+O programa soma 1 tres vezes em R3, grava em Mem[16], rele em R4 e entra em
+`JMP 9`. O teste executa duas vezes por reset e confere R3=R4=Mem[16]=0003,
+exatamente uma escrita por execucao, instrucao inicial preservada e o loop final.
 
 A sequencia completa de controle esta em [docs/control_unit.md](control_unit.md)
 e as conexoes internas em [docs/datapath.md](datapath.md).
+
+## Falha de endereco
+
+O datapath bloqueia efeitos na borda que detecta um endereco invalido e
+registra `address_fault`. Esse sinal entra em `halt` no controle, zerando
+os enables e congelando a FSM. A deteccao usa o endereco completo do PC na
+busca e a saida combinacional da ULA na captura do REM. O PC e os dados
+ficam retidos ate reset; nao existe instrucao nova nem vetor de excecao.
+A falha e registrada, evitando um laco combinacional controle/falha.
+
+Ao integrar na placa, conectar `address_fault` a um LED de diagnostico.
+A saida tem valor padrao para permitir omissao em instanciacoes antigas.
