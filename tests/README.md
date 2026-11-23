@@ -26,7 +26,8 @@ R1 a R7 devem receber reset antes do uso: nao ha inicializacao implicita.
 - `reset` assincrono ativo em `1`, prioritario sobre a escrita.
 - Ao ler e escrever o mesmo registrador, a leitura passa a refletir o novo
   valor depois da borda de subida e da propagacao combinacional.
-- Enderecos devem conter apenas bits binarios validos.
+- Enderecos com bits invalidos (X/U/Z) retornam zero, sem indexar fora do
+  intervalo 1..7.
 
 O testbench verifica os sete registradores gravaveis, as 64 combinacoes de
 leitura, leitura simultanea do mesmo registrador, escrita desabilitada,
@@ -125,13 +126,30 @@ campos e extensao de sinal, sem implementar um decodificador ou executar
 instrucoes. A imagem nao especifica operacoes, papeis de origem/destino dos
 registradores nem como o endereco J gera o proximo PC.
 
+## Caminho de dados
+
+```bash
+GHDL=/caminho/para/ghdl bash tests/run_datapath.sh
+```
+
+`tb_datapath.vhd` usa `datapath_test.mif`, copiado para um diretorio
+temporario como nos outros testes. O banco de registradores comeca zerado e o
+testbench dirige os sinais de controle borda a borda, sem unidade de controle.
+
+A sequencia verifica a busca em duas bordas (a RAM so entrega a palavra no
+ciclo seguinte), a captura de Rj e Rk/Ri em reg_a/reg_b, o calculo da ULA com
+o operando B vindo do imediato ou do banco, a gravacao e a releitura da RAM,
+o retorno de alu_out ou RDM ao banco, um BEQ nao tomado, um BEQ tomado, um JMP
+e a preservacao do PC diante de um opcode invalido. O teste tambem confirma que
+o REM captura a saida combinacional da ULA, e nao o alu_out antigo.
+
 ## Executar todas as suites
 
 ```bash
 GHDL=/home/luccas/.local/opt/ghdl-6.0.0/ghdl-mcode-6.0.0-ubuntu24.04-x86_64/bin/ghdl bash tests/run_all.sh
 ```
 
-Com GHDL no PATH, basta `bash tests/run_all.sh`. São oito suítes, incluindo banco, registrador de instrução, PC, extensor,
+Com GHDL no PATH, basta `bash tests/run_all.sh`. São nove suítes, incluindo banco, registrador de instrução, PC, extensor,
 formatos, ULA, registradores da ULA e memória.
 
 

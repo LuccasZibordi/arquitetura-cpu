@@ -14,11 +14,13 @@ Componentes de uma CPU de 16 bits em VHDL-2008.
 | memory.vhd | RAM síncrona de 1024 palavras de 16 bits, inicializada por MIF |
 | memory_address_register.vhd | Registrador de endereço da memória (REM), 10 bits |
 | memory_data_register.vhd | Registrador de dados da memória (RDM), 16 bits |
+| datapath.vhd | Liga PC, IR, banco, ULA, registradores e RAM; controles entram pela porta |
 
 Todos os registradores usam subida do clock e reset assincrono ativo alto.
 O arquivo ula.vhd incompleto foi substituido por alu.vhd (entidade alu).
-Ainda nao ha CPU completa: faltam integracao e controle. A ISA esta
-especificada em [docs/isa.md](docs/isa.md). A validacao atual e por simulacao
+Ainda nao ha CPU completa: falta a unidade de controle. A ISA esta em
+[docs/isa.md](docs/isa.md) e o caminho de dados em [docs/datapath.md](docs/datapath.md).
+A validacao atual e por simulacao
 de componentes e do caminho reg_a/reg_b -> ULA -> alu_out, sem validacao FPGA.
 
 ## Testes
@@ -35,5 +37,5 @@ Nesta maquina:
 GHDL=/home/luccas/.local/opt/ghdl-6.0.0/ghdl-mcode-6.0.0-ubuntu24.04-x86_64/bin/ghdl bash tests/run_all.sh
 ```
 
-As oito suites usam diretorios temporarios e falham ao detectar uma assertion.
+As nove suites usam diretorios temporarios e falham ao detectar uma assertion.
 Veja [interfaces, operacoes, flags e cobertura](tests/README.md).

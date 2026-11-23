@@ -34,8 +34,10 @@ begin
     end process;
 
     -- Portas independentes de leitura combinacional.
-    read_data1 <= (others => '0') when read_addr1 = "000" else
+    -- Enderecos com metavalores tambem devem retornar zero, para nao indexar
+    -- fora do intervalo 1..7 antes do primeiro reset.
+    read_data1 <= (others => '0') when read_addr1 = "000" or is_x(read_addr1) else
                   registers(to_integer(unsigned(read_addr1)));
-    read_data2 <= (others => '0') when read_addr2 = "000" else
+    read_data2 <= (others => '0') when read_addr2 = "000" or is_x(read_addr2) else
                   registers(to_integer(unsigned(read_addr2)));
 end architecture rtl;
