@@ -1,1 +1,4 @@
 .build/
+/db/
+/incremental_db/
+/cpu_de2_115.qws

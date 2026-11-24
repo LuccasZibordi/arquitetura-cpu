@@ -7,7 +7,97 @@ de progresso foi solicitado pelo grupo.
 
 Roteiro de retomada e requisitos de ambiente: [pendencias-e-dependencias.md](pendencias-e-dependencias.md).
 
-## Onde paramos
+## Atualização de 24/11/2026
+
+Abrir `cpu_de2_115.qpf` no Quartus Prime Lite 20.1. A parte 6 tem QPF,
+QSF com os 106 pinos das portas do top, 17 fontes RTL, MIF da demo e SDC.
+O Timing Analyzer pré-Fitter
+leu o SDC e reconheceu CLOCK_50 a 50 MHz. A referência de pinagem é o
+QSF Terasic fornecido pelo grupo. Conferir revisão e jumpers na placa.
+
+A habilitação explícita de leitura em `memory.vhd` corrigiu a inferência
+da RAM. O Fitter confirmou 1024 × 16 bits em dois M9K, com clock único e
+`cpu_test.mif` associado. A escrita bloqueia a leitura na mesma borda.
+As 34 simulações ModelSim passaram após a correção.
+
+### Parte 7 — interface integrada
+
+O quarto cenário do top usa `tests/top_memory.mif`. Carrega 7FFF,
+soma 1, observa o LED de overflow, grava 8000 e provoca falha em JMP 0400.
+O teste interrompe leitura e escrita por reset, confere o conteúdo da RAM
+após pausa e após escrita autorizada, alterna modo com botão mantido e
+verifica dois passos próximos e a retomada após falha. Os 35 casos do
+ModelSim passaram. Em cópia temporária, retirar a habilitação interna
+de escrita da RAM fez o teste falhar ao reler o dado após a pausa.
+
+### Parte 8 — compilação e timing
+
+Na raiz do projeto, `quartus_sh --flow compile cpu_de2_115` concluiu com
+0 erros e 30 avisos no Quartus Prime Lite 20.1.0 Build 711. O Fitter
+usou 649 elementos lógicos, 285 registradores, 106 pinos e dois blocos
+M9K com a imagem `cpu_test.mif`. Os relatórios ficam em `.build/quartus/`.
+
+Para CLOCK_50 a 50 MHz, as menores folgas entre os três modelos foram
+5,009 ns de setup, 0,181 ns de hold, 13,458 ns de recovery, 2,989 ns de
+removal e 9,200 ns de largura de pulso. TNS zero em todas as verificações.
+O Timing Analyzer confirmou cobertura completa para setup e hold com as
+exceções de entradas assíncronas e indicadores previstas no SDC.
+
+O aviso 15714 registra ausência de valores explícitos de corrente e slew
+rate para as 83 saídas. O QSF de referência deixa esses parâmetros no
+padrão. O aviso 169177 abrange requisitos elétricos de 23 entradas.
+Conferir tensões dos bancos e jumpers na placa antes da programação.
+O aviso 276027 da RAM refere-se à leitura simultânea à escrita, bloqueada
+pelo RTL. O Fitter confirmou clock único.
+
+Imagem desta execução: `.build/quartus/cpu_de2_115.sof`, 3.541.748 bytes.
+SHA-256: `46c77bfdbbb0a70d96e11e610f876fd2c4139170d76ab65f4b0d5c05ad140f36`.
+A parte 9 começa pela conferência física da DE2-115 e programação por JTAG.
+
+### Parte 9 — lembrete para o laboratório
+
+**Pendente. Executar quando a DE2-115 estiver disponível.** Registrar data,
+revisão da placa, hash do SOF e fotos ou vídeo com os valores observados.
+
+- [ ] Conferir dispositivo, tensões e jumpers dos bancos de I/O. Detectar
+  o USB-Blaster em JTAG e carregar o SOF da demo pelo Quartus Programmer.
+- [ ] Com SW0 em 0, aplicar KEY0. Conferir PC 0000. Cada pressão de KEY1
+  deve avançar um ciclo da máquina de estados, inclusive quando mantida.
+  Com SW3..1 em 000, após dois passos esperar PC 0001 e instrução 5203.
+- [ ] Passar ao contínuo com SW0 em 1 e voltar ao manual. No laço final,
+  selecionar RDM (SW3..1 = 100) e conferir 0003 em HEX3..0 e LEDR15..0.
+  Selecionar IR (000) e conferir A009. Repetir após reset e reprogramação.
+- [ ] Com imagens específicas, comparar aritmética, memória e desvios
+  com os resultados de [programs.md](programs.md). Com o MIF de teste
+  `tests/top_memory.mif`, observar LEDG5 durante a soma 7FFF + 1 em passo
+  manual e LEDR17 após JMP 0400. Conferir parada até reset. Cada imagem
+  requer um SOF com o MIF correspondente associado à RAM.
+
+### Parte 10 — reprodução em pasta limpa
+
+Em 24/11/2026, a cópia dos arquivos de trabalho, incluindo as fontes
+ainda fora do Git, começou sem banco de compilação, biblioteca ModelSim
+ou SOF anterior. As 35 simulações passaram e a compilação completa
+terminou com 0 erros e 30 avisos. O resumo de timing coincide com o da
+parte 8. O SOF desta compilação tem SHA-256
+`f682fdbbc831bcb514359c74663dd3858091bb9b2104146b02ae57fb07f2827f`.
+As duas compilações produziram hashes distintos para o SOF.
+
+Na nova pasta, executar `quartus_sh --flow compile cpu_de2_115`.
+Para repetir o ModelSim no Windows, definir MODELSIM_BIN com a pasta
+dos executáveis e MODELSIM com o caminho absoluto de uma cópia gravável
+do modelsim.ini da instalação. Na raiz do projeto em PowerShell:
+
+```powershell
+vsim -c -do 'if {[catch {source [file normalize tests/run_modelsim.do]} message]} {puts $message; quit -force -code 1}; quit -force -code 0'
+```
+
+Logs, relatórios, SOF e manifesto SHA-256 das entradas usadas estão em
+`.build/parte10-cpu-repro-f2cedcfa-539b-4f52-a2ce-158af28da267/`.
+Incluir os arquivos novos ao transportar o projeto para o laboratório.
+
+## Histórico de 23/11
+
 
 **Parte 1: levantamento realizado; requisitos completos ainda pendentes.**
 **Parte 2: script preparado; falta executar no ModelSim do laboratorio.**

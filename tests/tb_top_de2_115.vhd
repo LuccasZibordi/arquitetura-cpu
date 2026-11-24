@@ -3,7 +3,8 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use std.env.finish;
 entity tb_top_de2_115 is
-    generic (fault_case : boolean := false; digits_case : boolean := false);
+    generic (fault_case : boolean := false; digits_case : boolean := false;
+             memory_case : boolean := false);
 end entity;
 architecture test of tb_top_de2_115 is
     signal clk : std_logic := '0';
@@ -20,6 +21,7 @@ architecture test of tb_top_de2_115 is
         "0001000","0000011","1000110","0100001","0000110","0001110");
     function image_name return string is
     begin
+        if memory_case then return "top_memory.mif"; end if;
         if digits_case then return "top_digits.mif"; end if;
         if fault_case then return "top_fault.mif"; end if;
         return "cpu_test.mif";
@@ -71,12 +73,68 @@ begin
             assert word(hex,0) = expected and lr(15 downto 0) = expected
                 report "observacao incorreta, selecao " & integer'image(n) severity failure;
         end;
+        procedure reach(state : natural; pc : natural) is
+        begin
+            for i in 0 to 40 loop
+                if unsigned(lg(3 downto 0)) = state and unsigned(word(hex,4)) = pc then
+                    return;
+                end if;
+                step;
+            end loop;
+            assert false report "estado/PC esperado nao atingido" severity failure;
+        end;
+        procedure restart is
+        begin
+            keys(0) <= '0'; wait for 1 ns;
+            assert lr(17 downto 16) = "01" and word(hex,4) = x"0000"
+                and lg(8 downto 7) = "00" report "reset durante execucao" severity failure;
+            sw(0) <= '0'; cycles(2); keys(0) <= '1'; cycles(10);
+        end;
     begin
         cycles(2);
         assert lr(16) = '1' and word(hex,4) = x"0000" report "reset/top" severity failure;
         assert lg(5 downto 4) = "01" report "flags no reset" severity failure;
         keys(0) <= '1'; cycles(10);
         assert lr(16) = '0' and lg(3 downto 0) = x"0" report "liberacao reset" severity failure;
+        if memory_case then
+            -- LD R1,[16]; ADDI R2,R1,1; ST R2,[16]; JMP 0400.
+            reach(5,1);
+            select_view(5,x"6210"); -- A leitura de dados ainda aguarda um passo.
+            restart;
+            reach(9,1); select_view(4,x"7FFF");
+            reach(3,2);
+            assert lg(5) = '1' report "Overflow ausente em 7FFF + 1" severity failure;
+            step; select_view(3,x"8000");
+            reach(7,3);
+            cycles(12);
+            assert stores = 0 report "store sinalizado durante pausa" severity failure;
+            restart;
+            -- Reset preserva RAM: uma escrita interna indevida apareceria aqui.
+            reach(9,1); select_view(4,x"7FFF");
+            reach(7,3); step;
+            assert stores = 1 report "store habilitado nao executado" severity failure;
+            -- Botao mantido ao sair do continuo precisa ser rearmado.
+            sw(0) <= '1'; keys(1) <= '0'; cycles(16);
+            assert lg(6) = '1' and lr(17) = '1' report "falha no continuo" severity failure;
+            restart;
+            assert lg(3 downto 0) = x"0" report "passo fantasma apos reset" severity failure;
+            sw(0) <= '1'; cycles(6);
+            sw(0) <= '0'; cycles(8);
+            held := hex;
+            cycles(8);
+            assert hex = held and lg(6) = '0' report "modo manual com tecla mantida" severity failure;
+            restart;
+            keys(1) <= '1'; cycles(6);
+            for expected_state in 1 to 2 loop
+                keys(1) <= '0'; cycles(6); keys(1) <= '1'; cycles(6);
+                assert unsigned(lg(3 downto 0)) = expected_state
+                    report "passos consecutivos perdidos ou repetidos" severity failure;
+            end loop;
+            reach(9,1); select_view(4,x"8000");
+            assert stores = 1 and lr(17) = '0' report "retomada apos falha" severity failure;
+            report "PASS: top memoria, pausa, overflow, modos e recuperacao";
+            finish;
+        end if;
         if digits_case then
             for d in 0 to 15 loop
                 step; step;

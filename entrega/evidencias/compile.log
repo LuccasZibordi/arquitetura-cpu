@@ -1,0 +1,96 @@
+Model Technology ModelSim - Intel FPGA Edition vcom 2020.1 Compiler 2020.02 Feb 28 2020
+Start time: 11:23:14 on Nov 24,2026
+vcom -2008 -work work D:/projetos/arquitetura-cpu/pc.vhd D:/projetos/arquitetura-cpu/instruction_register.vhd D:/projetos/arquitetura-cpu/memory.vhd D:/projetos/arquitetura-cpu/register_file.vhd D:/projetos/arquitetura-cpu/immediate_extender.vhd D:/projetos/arquitetura-cpu/reg_a.vhd D:/projetos/arquitetura-cpu/reg_b.vhd D:/projetos/arquitetura-cpu/alu.vhd D:/projetos/arquitetura-cpu/alu_out.vhd D:/projetos/arquitetura-cpu/memory_address_register.vhd D:/projetos/arquitetura-cpu/memory_data_register.vhd D:/projetos/arquitetura-cpu/datapath.vhd D:/projetos/arquitetura-cpu/decoder.vhd D:/projetos/arquitetura-cpu/control_unit.vhd D:/projetos/arquitetura-cpu/cpu.vhd D:/projetos/arquitetura-cpu/board_controls.vhd D:/projetos/arquitetura-cpu/top_de2_115.vhd D:/projetos/arquitetura-cpu/tests/tb_address_fault.vhd D:/projetos/arquitetura-cpu/tests/tb_alu.vhd D:/projetos/arquitetura-cpu/tests/tb_alu_registers.vhd D:/projetos/arquitetura-cpu/tests/tb_board_controls.vhd D:/projetos/arquitetura-cpu/tests/tb_control_unit.vhd D:/projetos/arquitetura-cpu/tests/tb_cpu.vhd D:/projetos/arquitetura-cpu/tests/tb_cpu_enable.vhd D:/projetos/arquitetura-cpu/tests/tb_datapath.vhd D:/projetos/arquitetura-cpu/tests/tb_immediate_extender.vhd D:/projetos/arquitetura-cpu/tests/tb_instruction_formats.vhd D:/projetos/arquitetura-cpu/tests/tb_instruction_register.vhd D:/projetos/arquitetura-cpu/tests/tb_memory.vhd D:/projetos/arquitetura-cpu/tests/tb_pc.vhd D:/projetos/arquitetura-cpu/tests/tb_program.vhd D:/projetos/arquitetura-cpu/tests/tb_register_file.vhd D:/projetos/arquitetura-cpu/tests/tb_top_de2_115.vhd tb_runner_probe.vhd 
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Compiling entity PC
+-- Compiling architecture rtl of PC
+-- Compiling entity instruction_register
+-- Compiling architecture rtl of instruction_register
+-- Loading package NUMERIC_STD
+-- Compiling entity memory
+-- Compiling architecture rtl of memory
+-- Compiling entity register_file
+-- Compiling architecture rtl of register_file
+-- Compiling entity immediate_extender
+-- Compiling architecture rtl of immediate_extender
+** Warning: D:/projetos/arquitetura-cpu/immediate_extender.vhd(14): (vcom-1514) Range choice direction (downto) does not determine aggregate index range direction (to).
+-- Compiling entity reg_a
+-- Compiling architecture rtl of reg_a
+-- Compiling entity reg_b
+-- Compiling architecture rtl of reg_b
+-- Compiling entity alu
+-- Compiling architecture rtl of alu
+-- Compiling entity alu_out
+-- Compiling architecture rtl of alu_out
+-- Compiling entity memory_address_register
+-- Compiling architecture rtl of memory_address_register
+-- Compiling entity memory_data_register
+-- Compiling architecture rtl of memory_data_register
+-- Compiling entity datapath
+-- Compiling architecture rtl of datapath
+-- Loading entity PC
+-- Loading entity instruction_register
+-- Loading entity memory
+-- Loading entity register_file
+-- Loading entity immediate_extender
+-- Loading entity reg_a
+-- Loading entity reg_b
+-- Loading entity alu
+-- Loading entity alu_out
+-- Loading entity memory_address_register
+-- Loading entity memory_data_register
+-- Compiling entity decoder
+-- Compiling architecture rtl of decoder
+-- Compiling entity control_unit
+-- Compiling architecture rtl of control_unit
+-- Loading entity decoder
+-- Compiling entity cpu
+-- Compiling architecture rtl of cpu
+-- Loading entity datapath
+-- Loading entity control_unit
+-- Compiling entity board_controls
+-- Compiling architecture rtl of board_controls
+-- Compiling entity top_de2_115
+-- Compiling architecture rtl of top_de2_115
+-- Loading entity board_controls
+-- Loading entity cpu
+-- Loading package ENV
+-- Compiling entity tb_address_fault
+-- Compiling architecture sim of tb_address_fault
+-- Compiling entity tb_alu
+-- Compiling architecture test of tb_alu
+-- Compiling entity tb_alu_registers
+-- Compiling architecture test of tb_alu_registers
+-- Compiling entity tb_board_controls
+-- Compiling architecture test of tb_board_controls
+-- Compiling entity tb_control_unit
+-- Compiling architecture sim of tb_control_unit
+-- Compiling entity tb_cpu
+-- Compiling architecture sim of tb_cpu
+-- Compiling entity tb_cpu_enable
+-- Compiling architecture test of tb_cpu_enable
+-- Compiling entity tb_datapath
+-- Compiling architecture sim of tb_datapath
+-- Compiling entity tb_immediate_extender
+-- Compiling architecture test of tb_immediate_extender
+-- Compiling entity tb_instruction_formats
+-- Compiling architecture test of tb_instruction_formats
+-- Compiling entity tb_instruction_register
+-- Compiling architecture test of tb_instruction_register
+-- Compiling entity tb_memory
+-- Compiling architecture test of tb_memory
+-- Compiling entity tb_pc
+-- Compiling architecture test of tb_pc
+-- Compiling entity tb_program
+-- Compiling architecture sim of tb_program
+-- Compiling entity tb_register_file
+-- Compiling architecture test of tb_register_file
+-- Compiling entity tb_top_de2_115
+-- Compiling architecture test of tb_top_de2_115
+-- Loading entity top_de2_115
+-- Compiling entity tb_runner_probe
+-- Compiling architecture test of tb_runner_probe
+End time: 11:23:14 on Nov 24,2026, Elapsed time: 0:00:00
+Errors: 0, Warnings: 1

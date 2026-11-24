@@ -45,6 +45,7 @@ namespace eval cpu_regression {
             foreach image [glob [file join $root *.mif]] {
                 file copy $image .
             }
+            file copy [file join $root tests top_memory.mif] .
             write_file top_fault.mif "DEPTH = 1024;\nWIDTH = 16;\nADDRESS_RADIX = HEX;\nDATA_RADIX = HEX;\nCONTENT BEGIN\n000 : A400;\n\[001..3FF\] : 0000;\nEND;"
             set digits_mif "DEPTH = 1024;\nWIDTH = 16;\nADDRESS_RADIX = HEX;\nDATA_RADIX = HEX;\nCONTENT BEGIN\n"
             for {set d 0} {$d < 16} {incr d} {
@@ -175,6 +176,8 @@ end architecture;
                     incr count
                 }
                 execute top_digits [concat $common [list -gdigits_case=true work.tb_top_de2_115]]
+                incr count
+                execute top_memory [concat $common [list -gmemory_case=true work.tb_top_de2_115]]
                 incr count
                 set summary "PASS: $count simulacoes; probes de finish/assertion/timeout verificados."
                 write_file summary.txt $summary

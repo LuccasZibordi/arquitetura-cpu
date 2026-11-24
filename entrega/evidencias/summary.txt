@@ -1,0 +1,1 @@
+PASS: 35 simulacoes; probes de finish/assertion/timeout verificados.

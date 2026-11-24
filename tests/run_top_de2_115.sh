@@ -5,6 +5,7 @@ build_dir="$(mktemp -d)"
 trap 'rm -rf -- "$build_dir"' EXIT
 simulator="${GHDL:-ghdl}"
 cp -- "$project_dir/cpu_test.mif" "$build_dir/"
+cp -- "$project_dir/tests/top_memory.mif" "$build_dir/"
 cat > "$build_dir/top_fault.mif" <<'MIF'
 DEPTH = 1024;
 WIDTH = 16;
@@ -41,6 +42,7 @@ cd "$build_dir"
     printf '[010..3FF] : 0000;\nEND;\n'
 } > top_digits.mif
 "$simulator" --elab-run --std=08 tb_top_de2_115 -gdigits_case=true --assert-level=error
+"$simulator" --elab-run --std=08 tb_top_de2_115 -gmemory_case=true --assert-level=error
 for fault_case in false true; do
     "$simulator" --elab-run --std=08 tb_top_de2_115 -gfault_case="$fault_case" --assert-level=error
 done

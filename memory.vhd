@@ -96,13 +96,16 @@ architecture rtl of memory is
 
     attribute ram_init_file : string;
     attribute ram_init_file of ram : signal is init_file;
+    signal read_active : std_logic;
 begin
+    read_active <= read_enable and not write_enable;
     process(clk)
     begin
         if rising_edge(clk) then
             if write_enable = '1' then
                 ram(to_integer(unsigned(address))) <= data_in;
-            elsif read_enable = '1' then
+            end if;
+            if read_active = '1' then
                 data_out <= ram(to_integer(unsigned(address)));
             end if;
         end if;
