@@ -39,3 +39,25 @@ O script grava summary.txt, version.log e os logs de cada cenário em .build/mod
 Abra Apresentacao.html no navegador e avance com Page Down. A demonstração física segue o roteiro de bancada. Para inspecionar a forma de onda da simulação, abra evidencias/p3_mem.wlf no ModelSim ou importe p3_mem.vcd em um visualizador VCD. Dentro de tb_program, examine clk, state, pc, fetched, rdm, reg_write e mem_write. No primeiro LD, fetched passa a 7FFF antes de o RDM capturar esse valor. No ST, o endereço é 0011 e o dado é 8000. O LD seguinte recupera 8000.
 
 A documentação técnica completa acompanha os fontes em docs/. A conferência dos critérios acadêmicos depende do enunciado integral do professor.
+
+## Revisão de bancada — 25/11/2026
+
+O roteiro PDF foi ampliado para oito páginas, com critérios de aprovação,
+passos detalhados, diagnóstico e ficha de resultados. A suíte local GHDL
+passou novamente; log em `evidencias/ghdl-2026-11-25.log`. Os seis hashes
+SOF foram conferidos, sem alteração das imagens. ModelSim e Quartus têm
+evidências recebidas, não foram reexecutados nesta revisão. Testes físicos
+continuam pendentes. Para recriar o PDF, use Python com reportlab e execute
+`python docs/tools/gerar_roteiro_pdf.py` na raiz.
+
+## Guias de estudo — 25/11/2026
+
+- [Código, placa e demo](01%20-%20Do%20codigo%20a%20placa%20e%20explicacao%20da%20demo.pdf): 7 páginas sobre configuração, módulos, controles e execução da demonstração.
+- [Perguntas e respostas para arguição](02%20-%20Perguntas%20e%20respostas%20para%20arguicao.pdf): 40 perguntas em 7 páginas, com referências aos fontes.
+- [Guia dos arquivos](03%20-%20Guia%20dos%20arquivos%20do%20projeto.pdf): 10 páginas sobre RTL, testes, MIF, Quartus, documentação e evidências.
+
+Os três PDFs têm marcadores de navegação. Fonte reproduzível:
+`docs/tools/gerar_guias_estudo.py` (Python + ReportLab).
+Foram adicionados à pasta entrega após a montagem dos ZIPs anteriores;
+esses ZIPs não foram atualizados nesta rodada. Nenhuma mudança no circuito
+ou nas imagens SOF. Os guias não representam confirmação dos testes físicos.

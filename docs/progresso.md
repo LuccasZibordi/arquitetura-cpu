@@ -1,11 +1,23 @@
 # Progresso da conclusao do projeto
 
-Atualizado em 23/11/2026. Base observada main/7ef79b0; alteracoes desta etapa locais,
-sem commit/push. Este arquivo e o ponto de retomada da implementacao.
-Relatorio academico e apresentacao continuam fora desta rodada; o registro
-de progresso foi solicitado pelo grupo.
+Atualizado em 25/11/2026. Checkout observado main/fd9d217.
 
-Roteiro de retomada e requisitos de ambiente: [pendencias-e-dependencias.md](pendencias-e-dependencias.md).
+## Estado atual — revisão de 25/11/2026
+
+As partes de preparação 2–8 e a reprodução 10 têm implementação/evidências
+registradas na atualização de 24/11 abaixo. **Próximo passo: parte 9,
+testes físicos na DE2-115.** Conferência do enunciado integral permanece
+pendente. As seções de 23/11 são históricas e não descrevem o estado atual.
+
+Nesta revisão: 16 suítes GHDL passaram (37 mensagens PASS); seis hashes
+SOF conferidos; 106 pinos conferidos com a referência, sem divergências ou
+duplicações. ModelSim/Quartus não foram reexecutados aqui; seus relatórios
+recebidos foram inspecionados. Nenhum RTL ou imagem de programação mudou.
+
+Roteiro de bancada ampliado para oito páginas em
+`entrega/Roteiro de testes - DE2-115.pdf`, com fonte reproduzível em
+`docs/tools/gerar_roteiro_pdf.py`. Pendências atuais:
+[pendencias-e-dependencias.md](pendencias-e-dependencias.md).
 
 ## Atualização de 24/11/2026
 

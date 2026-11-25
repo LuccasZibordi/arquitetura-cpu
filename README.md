@@ -30,8 +30,8 @@ A CPU completa esta integrada em `cpu.vhd` e documentada em
 [docs/cpu.md](docs/cpu.md). A ISA esta em [docs/isa.md](docs/isa.md), o caminho
 de dados em [docs/datapath.md](docs/datapath.md), o controle em
 [docs/control_unit.md](docs/control_unit.md) e os programas de teste em
-[docs/programs.md](docs/programs.md). A validacao e por simulacao, sem
-validacao FPGA.
+[docs/programs.md](docs/programs.md). Há validação por simulação e relatórios de compilação/timing Quartus.
+A validação física na FPGA permanece pendente.
 
 ## Testes
 

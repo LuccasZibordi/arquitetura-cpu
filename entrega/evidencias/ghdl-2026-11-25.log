@@ -1,0 +1,73 @@
+/home/luccas/Projects/arquitetura-cpu/tests/tb_register_file.vhd:112:9:@131ns:(report note): PASS: register_file (reset, escrita, duas leituras e R0)
+simulation finished @131ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_instruction_register.vhd:91:9:@37ns:(report note): PASS: instruction_register (captura, retencao, bordas e reset)
+simulation finished @37ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_pc.vhd:101:9:@57ns:(report note): PASS: PC (carga, retencao, destinos, bordas e reset)
+simulation finished @57ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_immediate_extender.vhd:53:9:@71ns:(report note): PASS: immediate_extender (64 entradas e limites de sinal)
+simulation finished @71ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_instruction_formats.vhd:76:9:@10ns:(report note): PASS: formato R
+/home/luccas/Projects/arquitetura-cpu/tests/tb_instruction_formats.vhd:86:9:@28ns:(report note): PASS: formato I e extensao de sinal
+/home/luccas/Projects/arquitetura-cpu/tests/tb_instruction_formats.vhd:97:9:@40ns:(report note): PASS: formato J
+/home/luccas/Projects/arquitetura-cpu/tests/tb_instruction_formats.vhd:99:9:@40ns:(report note): PASS: tres formatos R/I/J
+simulation finished @40ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_alu.vhd:77:9:@266ns:(report note): PASS: ALU (266 vetores, cinco operacoes, Zero e overflow signed)
+simulation finished @266ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_alu_registers.vhd:73:9:@62ns:(report note): PASS: reg_a, reg_b, alu_out (bordas, enables, reset e caminho integrado)
+simulation finished @62ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_memory.vhd:110:9:@127ns:(report note): Testes da RAM, REM e RDM passaram
+simulation finished @127ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_datapath.vhd:199:9:@496ns:(report note): PASS: datapath (busca, operandos, ULA, memoria, banco, desvio e salto)
+simulation finished @496ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_control_unit.vhd:238:9:@660ns:(report note): PASS: control_unit (decoder, estados, saltos, reset e opcode invalido)
+simulation finished @660ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_cpu.vhd:98:9:@1580ns:(report note): PASS: demo executada duas vezes por reset, Mem[16]=R3=R4=3
+simulation finished @1580ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_program.vhd:161:9:@406ns:(report note): PASS: programa 1 (p1_arith.mif), 38 ciclos
+simulation finished @406ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_program.vhd:161:9:@406ns:(report note): PASS: programa 2 (p2_limit.mif), 38 ciclos
+simulation finished @406ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_program.vhd:161:9:@346ns:(report note): PASS: programa 3 (p3_mem.mif), 32 ciclos
+simulation finished @346ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_program.vhd:161:9:@716ns:(report note): PASS: programa 4 (p4_r0_jump.mif), 69 ciclos
+simulation finished @716ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_address_fault.vhd:114:9:@176ns:(report note): PASS: enderecamento, caso 1
+simulation finished @176ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_address_fault.vhd:114:9:@226ns:(report note): PASS: enderecamento, caso 2
+simulation finished @226ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_address_fault.vhd:114:9:@246ns:(report note): PASS: enderecamento, caso 3
+simulation finished @246ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_address_fault.vhd:114:9:@246ns:(report note): PASS: enderecamento, caso 4
+simulation finished @246ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_address_fault.vhd:114:9:@226ns:(report note): PASS: enderecamento, caso 5
+simulation finished @226ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_address_fault.vhd:114:9:@186ns:(report note): PASS: enderecamento, caso 6
+simulation finished @186ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_address_fault.vhd:114:9:@226ns:(report note): PASS: enderecamento, caso 7
+simulation finished @226ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_address_fault.vhd:114:9:@796ns:(report note): PASS: enderecamento, caso 8
+simulation finished @796ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_cpu_enable.vhd:99:9:@4056ns:(report note): PASS: pausa/passo equivalente a 100 ciclos continuos: cpu_test.mif
+simulation finished @4056ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_cpu_enable.vhd:99:9:@4056ns:(report note): PASS: pausa/passo equivalente a 100 ciclos continuos: p1_arith.mif
+simulation finished @4056ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_cpu_enable.vhd:99:9:@4056ns:(report note): PASS: pausa/passo equivalente a 100 ciclos continuos: p2_limit.mif
+simulation finished @4056ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_cpu_enable.vhd:99:9:@4056ns:(report note): PASS: pausa/passo equivalente a 100 ciclos continuos: p3_mem.mif
+simulation finished @4056ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_cpu_enable.vhd:99:9:@4056ns:(report note): PASS: pausa/passo equivalente a 100 ciclos continuos: p4_r0_jump.mif
+simulation finished @4056ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_cpu_enable.vhd:99:9:@4056ns:(report note): PASS: pausa/passo equivalente a 100 ciclos continuos: address_1.mif
+simulation finished @4056ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_board_controls.vhd:92:9:@1446ns:(report note): PASS: controles, debounce=1
+simulation finished @1446ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_board_controls.vhd:92:9:@2766ns:(report note): PASS: controles, debounce=4
+simulation finished @2766ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_top_de2_115.vhd:147:13:@9716ns:(report note): PASS: top todos os digitos hexadecimais
+simulation finished @9716ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_top_de2_115.vhd:135:13:@9796ns:(report note): PASS: top memoria, pausa, overflow, modos e recuperacao
+simulation finished @9796ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_top_de2_115.vhd:209:9:@17456ns:(report note): PASS: top DE2-115 fault=false
+simulation finished @17456ns
+/home/luccas/Projects/arquitetura-cpu/tests/tb_top_de2_115.vhd:209:9:@2476ns:(report note): PASS: top DE2-115 fault=true
+simulation finished @2476ns
